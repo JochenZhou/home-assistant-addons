@@ -1,7 +1,7 @@
 # Home Assistant Add-on Configuration
 name: "Sherpa-Onnx-STT-RKNPU"
 description: "基于 Sherpa-Onnx 和 RK3566 NPU 加速的语音转文字服务"
-version: "1.0.4"
+version: "1.0.5"
 slug: "sherpa_onnx_stt_rknpu"
 arch:
   - aarch64
