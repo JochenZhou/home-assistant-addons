@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+wYXQf6kePXxlIMPq
+
+# Large binary files (should be downloaded during build)
+*.whl
+*.tar.bz2
+librknnrt.so
+
+# Local settings
+.claude/

@@ -1,0 +1,63 @@
+# Home Assistant Add-on Configuration
+name: "Sherpa-Onnx-STT-RKNPU"
+description: "基于 Sherpa-Onnx 和 RK3566 NPU 加速的语音转文字服务"
+version: "1.0.4"
+slug: "sherpa_onnx_stt_rknpu"
+arch:
+  - aarch64
+init: false
+startup: application
+boot: manual
+homeassistant_api: false
+host_network: false
+host_ipc: true
+apparmor: true
+full_access: true
+tmpfs: true
+video: true
+
+map:
+  - share:rw
+  - addon_config:rw
+
+ports:
+  10400/tcp: 10400
+ports_description:
+  10400/tcp: "Wyoming STT 服务端口"
+
+# 默认配置选项
+options:
+  # 模型目录
+  model_dir: "/share/models"
+
+  # 调试模式 (输出详细日志)
+  debug: false
+
+  # 自定义模型名称 (留空使用默认 sense-voice-zh-5s-rk3566)
+  custom_model: ""
+
+  # 输出情绪 emoji (在识别文本前添加情绪 emoji)
+  output_emotion: false
+
+schema:
+  model_dir: str
+  debug: bool
+  custom_model: str?
+  output_emotion: bool
+
+# 资源限制 - 优化内存使用
+resources:
+  memory: 512m
+
+privileged:
+  - DAC_READ_SEARCH
+  - NET_ADMIN
+  - NET_RAW
+  - SYS_ADMIN
+  - SYS_NICE
+  - SYS_PTRACE
+  - SYS_RAWIO
+  - SYS_RESOURCE
+
+stage: experimental
+panel_icon: mdi:microphone

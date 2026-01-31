@@ -1,0 +1,28 @@
+{
+  "name": "Sherpa-Onnx-STT-RKNPU",
+  "version": "1.0.4",
+  "slug": "sherpa_onnx_stt_rknpu",
+  "description": "基于 Sherpa-Onnx 和 RK3566 NPU 加速的语音转文字服务，支持 Wyoming 协议",
+  "arch": ["aarch64"],
+  "url": "https://github.com/k2-fsa/sherpa-onnx",
+  "startup": "application",
+  "boot": "auto",
+  "init": false,
+  "map": ["share:rw", "addon_config:rw"],
+  "ports": {
+    "10400/tcp": 10400
+  },
+  "devices": ["/dev/rknpu"],
+  "options": {
+    "model_dir": "/share/models",
+    "debug": false,
+    "custom_model": "",
+    "output_emotion": false
+  },
+  "schema": {
+    "model_dir": "str",
+    "debug": "bool",
+    "custom_model": "str?",
+    "output_emotion": "bool"
+  }
+}

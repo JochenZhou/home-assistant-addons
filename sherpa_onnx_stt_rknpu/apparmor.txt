@@ -1,0 +1,87 @@
+#include <tunables/global>
+
+profile rk3566-npu-stt flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  capability,
+  file,
+  signal,
+  mount,
+  umount,
+  remount,
+  network udp,
+  network tcp,
+  network dgram,
+  network stream,
+  network inet,
+  network inet6,
+  network netlink raw,
+  network unix dgram,
+  network,
+
+  signal (send) set=(kill,term,int,hup,cont),
+
+  capability net_admin,
+  capability net_bind_service,
+  capability dac_read_search,
+  capability dac_override,
+  capability chown,
+  capability setgid,
+  capability setuid,
+  capability sys_admin,
+  capability sys_rawio,
+
+  # S6-Overlay
+  /init ix,
+  /run/{s6,s6-rc*,service}/** ix,
+  /package/** ix,
+  /command/** ix,
+  /run/{,**} rwk,
+  /dev/tty rw,
+  /bin/** ix,
+  /usr/bin/** ix,
+  /usr/lib/bashio/** ix,
+  /etc/s6/** rix,
+  /run/s6/** rix,
+  /etc/services.d/** rwix,
+  /etc/cont-init.d/** rwix,
+  /etc/cont-finish.d/** rwix,
+  /init rix,
+  /var/run/** mrwkl,
+  /var/run/ mrwkl,
+
+  # RKNN NPU 设备访问
+  /dev/rknpu mrwkl,
+  /dev/dri/** mrwkl,
+  /dev/dma_heap/** mrwkl,
+  /dev/mpp_service mrwkl,
+  /dev/rga mrwkl,
+  /dev/mali* mrwkl,
+  /dev/video* mrwkl,
+
+  # 通用设备访问
+  /dev/* mrwkl,
+  /dev/shm/** rwix,
+  /tmp/** mrkwl,
+
+  # 库文件访问
+  /usr/lib/** rm,
+  /lib/** rm,
+  /usr/local/lib/** rm,
+
+  # Python 和应用
+  /app/** rix,
+  /usr/lib/python*/** rm,
+
+  # 模型文件访问
+  /share/** rw,
+  /models/** rw,
+  /data/** rw,
+
+  # suppress ptrace denials when using 'docker ps' or using 'ps' inside a container
+  ptrace (trace,read) peer=docker-default,
+
+  # docker daemon confinement requires explicit allow rule for signal
+  signal (receive) set=(kill,term) peer=/usr/bin/docker,
+
+}

@@ -1,0 +1,34 @@
+configuration:
+  model_dir:
+    name: "Model Directory"
+    description: >-
+      Path to store model files. Default is /share/models.
+      Models will be automatically downloaded to this directory.
+      Please ensure sufficient storage space.
+  
+  debug:
+    name: "Debug Mode"
+    description: >-
+      Enable detailed debug logging including NPU status,
+      recognition time, RTF, etc.
+      Only enable when troubleshooting.
+
+  custom_model:
+    name: "Custom Model"
+    description: >-
+      Custom model name (leave empty to use default sense-voice-zh-5s-rk3566).
+
+      Two input methods supported:
+      1. Model alias (short name):
+         - sense-voice-zh-5s-rk3566: SenseVoice 5s version (default, recommended)
+         - sense-voice-zh-10s-rk3566: SenseVoice 10s version
+         - paraformer-zh-5s-rk3566: Paraformer 5s version
+         - paraformer-zh-10s-rk3566: Paraformer 10s version
+
+      2. Full model folder name (directly use folder name in model directory):
+         e.g., sherpa-onnx-rk3566-10-seconds-paraformer-zh-2025-10-07
+
+      Note: You need to download the corresponding model to the model directory first.
+
+network:
+  10400/tcp: "Wyoming STT service port - for communication with Home Assistant voice assistant"

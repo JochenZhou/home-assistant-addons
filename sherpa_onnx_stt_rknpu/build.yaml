@@ -1,0 +1,4 @@
+build_from:
+  aarch64: ghcr.io/home-assistant/aarch64-base:latest
+args:
+  BUILD_FROM: ghcr.io/home-assistant/aarch64-base:latest
