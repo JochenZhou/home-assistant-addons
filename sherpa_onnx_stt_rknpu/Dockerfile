@@ -60,7 +60,6 @@ RUN pip3 install --no-cache-dir --break-system-packages wyoming==1.5.4 && \
 COPY rknn_loader.py /app/
 COPY wyoming_server.py /app/
 COPY vad_asr.py /app/
-COPY test_audio.py /app/
 
 # 复制启动脚本
 COPY run.sh /
