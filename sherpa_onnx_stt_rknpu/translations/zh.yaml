@@ -29,5 +29,13 @@ configuration:
 
       注意：需要先下载对应的模型到模型目录。
 
+  output_emotion:
+    name: "输出情绪"
+    description: >-
+      启用后，在识别文本前添加情绪 emoji。
+      SenseVoice 模型支持识别说话人情感：
+      😊 开心、😢 悲伤、😠 愤怒、中性（无 emoji）。
+      例如：「😊 打开客厅的灯」「😠 关掉空调」。
+
 network:
   10400/tcp: "Wyoming STT 服务端口 - 用于与 Home Assistant 语音助手通信"

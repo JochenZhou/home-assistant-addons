@@ -30,5 +30,13 @@ configuration:
 
       Note: You need to download the corresponding model to the model directory first.
 
+  output_emotion:
+    name: "Output Emotion"
+    description: >-
+      When enabled, adds emotion emoji before recognized text.
+      SenseVoice model supports emotion detection:
+      😊 Happy, 😢 Sad, 😠 Angry, Neutral (no emoji).
+      Example: "😊 Turn on the living room light", "😠 Turn off the AC".
+
 network:
   10400/tcp: "Wyoming STT service port - for communication with Home Assistant voice assistant"
