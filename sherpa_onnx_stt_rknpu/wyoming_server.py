@@ -213,6 +213,11 @@ class STTEventHandler(AsyncEventHandler):
         rtf = elapsed / audio_duration if audio_duration > 0 else 0
         _LOGGER.info(f"Recognition time: {elapsed:.3f}s, RTF: {rtf:.3f}")
 
+        # 过滤无效识别结果（误唤醒时可能只识别出单个标点符号）
+        if text and len(text) <= 2 and all(c in '.,。，、!！?？…' for c in text):
+            _LOGGER.info(f"Filtered invalid result: '{text}' (likely false wake)")
+            return ""
+
         # 如果启用情绪输出且有情绪 emoji，添加到文本前
         if emotion_emoji and text:
             text = f"{emotion_emoji} {text}"
