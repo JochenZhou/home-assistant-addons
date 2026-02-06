@@ -15,7 +15,7 @@ from wyoming.event import Event
 from wyoming.info import AsrModel, AsrProgram, Attribution, Describe, Info
 from wyoming.server import AsyncEventHandler, AsyncServer
 
-from doubaoime_asr import ASRConfig, transcribe
+from doubaoime_asr import ASRConfig, transcribe_realtime, ResponseType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,8 +33,33 @@ class DoubaoASREventHandler(AsyncEventHandler):
         super().__init__(*args, **kwargs)
         self.wyoming_info = wyoming_info
         self.cli_args = cli_args
-        self._audio_buffer = bytes()
         self._converter: Optional[AudioChunkConverter] = None
+        self._audio_queue: Optional[asyncio.Queue] = None
+        self._stream_task: Optional[asyncio.Task] = None
+        self._final_text: str = ""
+
+    async def _audio_generator(self):
+        """异步生成器，从队列中读取音频数据"""
+        while True:
+            chunk = await self._audio_queue.get()
+            if chunk is None:  # 结束信号
+                break
+            yield chunk
+
+    async def _run_stream(self, config: ASRConfig):
+        """运行流式识别，处理中间和最终结果"""
+        try:
+            async for response in transcribe_realtime(
+                self._audio_generator(),
+                config=config
+            ):
+                match response.type:
+                    case ResponseType.FINAL_RESULT:
+                        self._final_text = response.text
+                    case ResponseType.ERROR:
+                        _LOGGER.error("Stream error: %s", response.error_msg)
+        except Exception as err:
+            _LOGGER.exception("Error in stream: %s", err)
 
     async def handle_event(self, event: Event) -> bool:
         """Handle Wyoming events."""
@@ -44,59 +69,62 @@ class DoubaoASREventHandler(AsyncEventHandler):
 
         if Transcribe.is_type(event.type):
             # 开始新的转录
-            self._audio_buffer = bytes()
             _LOGGER.debug("Starting new transcription")
             return True
 
         if AudioStart.is_type(event.type):
-            self._audio_buffer = bytes()
             # 创建转换器以确保音频格式正确
             self._converter = AudioChunkConverter(
                 rate=16000,
                 width=2,
                 channels=1,
             )
+            # 初始化流式识别
+            self._audio_queue = asyncio.Queue()
+            self._final_text = ""
+            # 创建 ASR 配置
+            config = ASRConfig(
+                credential_path=self.cli_args.credential_path,
+                sample_rate=16000,
+                channels=1,
+                enable_punctuation=self.cli_args.enable_punctuation,
+            )
+            # 启动流式识别任务
+            self._stream_task = asyncio.create_task(self._run_stream(config))
+            _LOGGER.debug("Started streaming recognition")
             return True
 
         if AudioChunk.is_type(event.type):
-            # 收集音频数据
+            # 将音频数据放入队列
             chunk = AudioChunk.from_event(event)
             if self._converter:
                 chunk = self._converter.convert(chunk)
-            self._audio_buffer += chunk.audio
+            if self._audio_queue:
+                await self._audio_queue.put(chunk.audio)
             return True
 
         if AudioStop.is_type(event.type):
-            # 音频结束，开始识别
-            _LOGGER.debug(
-                "Audio stopped, processing %d bytes", len(self._audio_buffer)
-            )
+            # 音频结束，发送结束信号并等待结果
+            _LOGGER.debug("Audio stopped, waiting for final result")
 
-            if self._audio_buffer:
+            if self._audio_queue and self._stream_task:
+                # 发送结束信号
+                await self._audio_queue.put(None)
+                # 等待流式识别完成
                 try:
-                    # 创建 ASR 配置
-                    config = ASRConfig(
-                        credential_path=self.cli_args.credential_path,
-                        sample_rate=16000,
-                        channels=1,
-                        enable_punctuation=self.cli_args.enable_punctuation,
-                    )
-
-                    # 执行语音识别
-                    text = await transcribe(self._audio_buffer, config=config)
-                    _LOGGER.info("Transcription result: %s", text)
-
-                    # 发送结果
-                    await self.write_event(Transcript(text=text or "").event())
-
+                    await self._stream_task
                 except Exception as err:
-                    _LOGGER.exception("Error during transcription: %s", err)
-                    await self.write_event(Transcript(text="").event())
+                    _LOGGER.exception("Error waiting for stream task: %s", err)
+
+                _LOGGER.info("Transcription result: %s", self._final_text)
+                await self.write_event(Transcript(text=self._final_text or "").event())
             else:
                 await self.write_event(Transcript(text="").event())
 
-            # 清空缓冲区
-            self._audio_buffer = bytes()
+            # 清理状态
+            self._audio_queue = None
+            self._stream_task = None
+            self._final_text = ""
             return True
 
         return True
