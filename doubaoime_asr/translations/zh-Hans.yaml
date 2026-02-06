@@ -1,0 +1,21 @@
+configuration:
+  credential_path:
+    name: "凭据文件路径"
+    description: >-
+      存储设备凭据的文件路径，首次运行会自动注册设备。
+      默认路径为 /config/credentials.json，
+      文件保存在 /addon_configs/local_doubaoime_asr/ 目录下。
+
+  enable_punctuation:
+    name: "启用标点符号"
+    description: >-
+      在识别结果中自动添加标点符号。
+
+  debug:
+    name: "调试模式"
+    description: >-
+      启用后会输出详细的调试日志，
+      仅在排查问题时启用。
+
+network:
+  10300/tcp: "Wyoming STT 服务端口 - 用于与 Home Assistant 语音助手通信"

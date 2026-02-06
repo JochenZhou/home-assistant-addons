@@ -1,0 +1,34 @@
+# Home Assistant Add-on Configuration
+name: "豆包语音识别 (Doubao ASR)"
+description: "基于豆包输入法的语音识别服务，通过 Wyoming 协议提供 STT 功能"
+version: "1.0.3"
+slug: "doubaoime_asr"
+arch:
+  - aarch64
+  - amd64
+init: false
+startup: application
+boot: auto
+homeassistant_api: false
+host_network: false
+
+map:
+  - addon_config:rw
+
+ports:
+  10300/tcp: 10300
+ports_description:
+  10300/tcp: "Wyoming STT 服务端口"
+
+options:
+  credential_path: "/config/credentials.json"
+  enable_punctuation: true
+  debug: false
+
+schema:
+  credential_path: str
+  enable_punctuation: bool
+  debug: bool
+
+stage: experimental
+panel_icon: mdi:microphone

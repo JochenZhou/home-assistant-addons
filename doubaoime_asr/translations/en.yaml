@@ -1,0 +1,20 @@
+configuration:
+  credential_path:
+    name: "Credential file path"
+    description: >-
+      Path to store device credentials, device will be registered automatically on first run.
+      Default path is /config/credentials.json,
+      file is saved in /addon_configs/local_doubaoime_asr/ directory.
+
+  enable_punctuation:
+    name: "Enable punctuation"
+    description: >-
+      Automatically add punctuation to transcription results.
+
+  debug:
+    name: "Debug mode"
+    description: >-
+      Enable debug logging for troubleshooting.
+
+network:
+  10300/tcp: "Wyoming STT service port - for communication with Home Assistant voice assistant"

@@ -20,6 +20,15 @@ https://github.com/JochenZhou/home-assistant-addons
 
 ## 可用加载项
 
+### [豆包语音识别 (Doubao ASR)](./doubaoime_asr)
+
+基于 [doubaoime-asr](https://github.com/starccy/doubaoime-asr) 的语音识别服务。
+
+- 使用豆包输入法的语音识别引擎
+- 支持中英文识别
+- 自动添加标点符号
+- Wyoming 协议支持，与 Home Assistant 无缝集成
+
 ### [Sherpa-Onnx-STT-RKNPU](./sherpa_onnx_stt_rknpu)
 
 基于 [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) 的 RK3566/RK3588 NPU 加速语音识别服务。
